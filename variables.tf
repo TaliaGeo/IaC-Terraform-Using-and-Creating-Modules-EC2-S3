@@ -1,53 +1,89 @@
-variable "aws_region" {
-  description = "The AWS region to launch resources in"
+variable "bucket_name" {
+  description = "The name of the S3 bucket"
   type        = string
+  default = "mybuckettest"
 }
 
-variable "instance_count" {
-  description = "Number of EC2 instances"
-  type        = number
-  default     = 2
-}
-
-variable "instance_type" {
-  description = "EC2 instance type"
-  type        = string
-  default     = "t2.micro"
-}
-
-
-variable "owner" {
-  description = "Owner tag for EC2 instances"
-  type        = string
-}
-
-
-variable "project_name" {
-  description = "Name of the project"
-  type        = string
-}
-
-variable "environment" {
-  description = "Deployment environment"
-  type        = string
- 
-}
-variable "ManagedBy" {
-  description = "Who manages the resources"
-  type        = string
-  
-}
-
-variable "tags" {
-  type = map(string)
-  default = {}
+variable "force_destroy" {
+  description = "Whether to force destroy all objects when deleting the bucket"
+  type        = bool
+  default     = false
 }
 
 variable "enable_versioning" {
-  type = bool
+  description = "Whether to enable versioning"
+  type        = bool
+  default     = false
+}
+
+variable "enable_mfa_delete" {
+  description = "Whether to enable MFA delete"
+  type        = bool
+  default     = false
+   
+}
+
+variable "enable_logging" {
+  description = "Whether to enable bucket logging"
+  type        = bool
+  default     = false
+}
+
+variable "noncurrent_days" {
+  description = "Number of days after which non-current versions expire"
+  type        = number
+  default     = 30
+}
+variable "expiration_days" {
+  description = "Number of days after which the bucket expires"
+  type        = number
+  default     = 60
 }
 
 variable "attach_policy" {
-  type = bool 
+  description = "Whether to attach a public read policy"
+  type        = bool
+  default     = false
 }
 
+variable "tags" {
+  description = "A map of tags to apply to the bucket"
+  type        = map(string)
+  default = {}
+}
+
+variable "additional_tags" {
+  description = "Extra tags to add on top of the default tags"
+  type        = map(string)
+  default     = {}
+}
+
+ variable "sse_algorithm" {
+  description = "The server-side encryption algorithm to use"
+  type        = string
+  default     = "AES256"
+
+  validation {
+    condition     = contains(["AES256", "aws:kms"], var.sse_algorithm)
+    error_message = "sse_algorithm must be either 'AES256' or 'aws:kms'."
+  }
+}
+
+
+ variable "versioning" {
+  description = "Map to control versioning and MFA delete"
+  type        = map(bool)
+  default     = {}
+}
+variable "log_bucket_name" {
+  description = "The name of the bucket to store logs (defaults to main bucket if empty)"
+  type        = string
+  default     = ""
+}
+
+
+variable "lifecycle_rule" {
+  description = "List of maps containing configuration of object lifecycle management."
+  type        = any
+  default     = []
+}
